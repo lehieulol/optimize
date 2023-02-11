@@ -13,6 +13,7 @@ import Backtrack
 import Branch_and_Bound
 import DCFlow
 import Constrain_Programing
+import Interger_Linear_Programming
 
 
 # 'test/N_{}_{}_M_{}_{}_K_{}_{}_Dense_{}_{}'.format(parameter.N_min,parameter.N_max, parameter.M_min, parameter.M_max, parameter.K_min, parameter.K_max, parameter.Density_min, T), 'w'
@@ -33,7 +34,6 @@ class Grader(Thread):
                 return id
 
     def interupt(self):
-        print('interupt called')
         self.end_time = time.time()
         thread_id = self.get_id()
         res = ctypes.pythonapi.PyThreadState_SetAsyncExc(thread_id, ctypes.py_object(SystemExit))
@@ -58,7 +58,7 @@ class Grader(Thread):
 
 
 T = parameter.test_num
-solvers = [Constrain_Programing.solve, DCFlow.solve]
+solvers = [DCFlow.solve, Constrain_Programing.solve, Interger_Linear_Programming.solve]
 while T:
     T -= 1
     N, M, K, linked = get_input(
@@ -74,11 +74,13 @@ while T:
     # chuyen phan thread join re ngoai
     for g in graders:
         g.join()
-        print('time:', g.get_time())
+        print(g.solver.__module__, 'time:', g.get_time())
         a = g.get_return()
         if a is None:
             print('failed')
         else:
             print(a[0])
+            '''
             for i in a[1]:
                 print(i)
+            '''
